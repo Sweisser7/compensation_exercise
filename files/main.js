@@ -247,11 +247,11 @@ function create(resource) {
                
                 fetch(createUrl, requestData, {
                     method: 'POST',
+                    headers: {'content-type': 'application/text'},
                 }).then( response => {
                         console.log(response);
                     if (response.status === 200) {
                         console.log('API call succeed');
-                        idforDOM(response);
                     } else if (response.status === 404) {
                         console.error('Resource not found.')
                     } else {
@@ -260,7 +260,7 @@ function create(resource) {
                     
                 })
         }))
-        .replace(document.querySelector('main'), document.getElementById(resource.idforDOM));
+        .append(document.getElementById(resource.idforDOM));
 
 }
 
