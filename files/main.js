@@ -72,12 +72,13 @@ class Animal {
 
 function add(resource, sibling) {
 
-
     if (resource.gender === true) {
-        let showGender = 'Male';
-    } else if (resource.gender === false) {
-       let showGender = 'Female';
-    };
+        genderOutput = "Male";
+    } else {
+        genderOutput = "Female";
+    }
+
+
 
     const creator = new ElementCreator("article")
         .id(resource.idforDOM);
@@ -94,7 +95,7 @@ function add(resource, sibling) {
         .append(new ElementCreator("h2").text(resource.kind))
         .append(new ElementCreator("strong").text(resource.age))
         .append(new ElementCreator("br"))
-        .append(new ElementCreator("strong").text(resource.gender));
+        .append(new ElementCreator("strong").text(genderOutput));
 
     creator
         .append(new ElementCreator("button").text("Edit").listener('click', () => {
@@ -178,7 +179,6 @@ function edit(resource) {
             resource.kind = document.getElementById("resource-kind").value;
             resource.age = document.getElementById("resource-age").value;
             resource.gender = document.getElementById("resource-gender").value;
-            console.log(resource.gender);
 
             /* Task 4 - Part 3: Call the update endpoint asynchronously. Once the call returns successfully,
                use the code below to remove the form we used for editing and again render 
@@ -192,6 +192,7 @@ function edit(resource) {
                }).then(response => {
                 if (response.status === 200) {
                     console.log('API call succeed');
+                    console.log(response.body);
                 } else if (response.status === 404) {
                     console.error('Resource not found.')
                 } else {
@@ -215,7 +216,7 @@ function remove(resource) {
    the server returns to the DOM (Remember, the resource returned by the server is the
     one that contains an id).
  */
-function create(resource) {
+function create() {
     const formCreator = new ElementCreator("form");
     formCreator.insertBefore(document.getElementById("new"), document.getElementById("resource-1"));
 
@@ -244,24 +245,27 @@ function create(resource) {
 
                 let createUrl = '/api/animal/resources/';
                 let requestData = {kind: kind, age: age, gender: gender};
-               
-                fetch(createUrl, requestData, {
-                    method: 'POST',
-                    headers: {'content-type': 'application/text'},
-                }).then( response => {
-                        console.log(response);
-                    if (response.status === 200) {
-                        console.log('API call succeed');
-                    } else if (response.status === 404) {
-                        console.error('Resource not found.')
-                    } else {
-                        console.error('Request failed with status:' + response.status);
-                    }
-                    
-                })
-        }))
-        .append(document.getElementById(resource.idforDOM));
 
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', createUrl, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            const responseData = JSON.parse(xhr.responseText);
+                            console.log(responseData);
+                        } else {
+                            console.error('API Error: ', xhr.status, xhr.statusText);
+                        }
+                    }
+                }
+                xhr.send(JSON.stringify(requestData));
+                
+                add(requestData, document.getElementById(requestData.idforDOM));
+                location.reload();
+                
+        }))
 }
 
 
