@@ -255,7 +255,7 @@ function create() {
                 xhr.onreadystatechange = function () { //function run when state of xhr status changes
                     if (xhr.readyState === XMLHttpRequest.DONE) { //check if request is finished
                         if (xhr.status === 200) {
-                            const responseData = JSON.parse(xhr.responseText); // changes response body into json
+                            const responseData = JSON.parse(xhr.responseText); // changes responsetext into json
                             console.log(responseData);
                         } else {
                             console.error('API Error: ', xhr.status, xhr.statusText);
