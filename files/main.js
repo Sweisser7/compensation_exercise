@@ -67,16 +67,17 @@ class Animal {
     get idforDOM() {
         return `resource-${this.id}`;
     }
-
 }
 
 function add(resource, sibling) {
+
+    console.log(resource.gender);
 
     if (resource.gender === true) {
         genderOutput = "Male";
     } else {
         genderOutput = "Female";
-    }
+    };
 
 
 
@@ -93,9 +94,10 @@ function add(resource, sibling) {
 
     creator
         .append(new ElementCreator("h2").text(resource.kind))
-        .append(new ElementCreator("strong").text(resource.age))
+        .append(new ElementCreator("strong").text("Age: " + resource.age + " years"))
         .append(new ElementCreator("br"))
-        .append(new ElementCreator("strong").text(genderOutput));
+        .append(new ElementCreator("strong").text("Gender: " + genderOutput))
+        .append(new ElementCreator("br"));
 
     creator
         .append(new ElementCreator("button").text("Edit").listener('click', () => {
@@ -109,7 +111,7 @@ function add(resource, sibling) {
                let deleteUrl = '/api/animal/resources/' + resource.id;
                fetch(deleteUrl, {
                 method: 'DELETE',
-               }).then(response => {
+               }).then(response => { // promise to use the response of api call
                 if (response.status === 204) {
                     console.log('API call succeed');
                 } else if (response.status === 404) {
@@ -130,7 +132,6 @@ function add(resource, sibling) {
     } else {
         creator.insertBefore(parent, document.querySelector('#bottom'));
     }
-        
 }
 
 function edit(resource) {
@@ -217,6 +218,7 @@ function remove(resource) {
     one that contains an id).
  */
 function create() {
+
     const formCreator = new ElementCreator("form");
     formCreator.insertBefore(document.getElementById("new"), document.getElementById("resource-1"));
 
@@ -229,10 +231,10 @@ function create() {
         .append(new ElementCreator("input").id("resource-age").with("type", "number"))
         .append(new ElementCreator("br"))
         .append(new ElementCreator("label").text("Gender").with("for", "resource-gender"))
-        .append(new ElementCreator("input").id("resource-gender").with("type", "radio"))
-        .append(new ElementCreator("label").id("resource-gender").text("Male"))
-        .append(new ElementCreator("input").id("resource-gender").with("type", "radio"))
-        .append(new ElementCreator("label").id("resource-gender").text("Female"));
+        .append(new ElementCreator("input").with("type", "radio").id("resource-gender").with("name", "resource-gender").with("value", true))
+        .append(new ElementCreator("label").text("Male").with("for", "resource-gender"))
+        .append(new ElementCreator("input").with("type", "radio").id("resource-gender").with("name", "resource-gender").with("value", false))
+        .append(new ElementCreator("label").text("Female").with("for", "resource-gender"));
         
 
     formCreator
@@ -250,21 +252,20 @@ function create() {
                 xhr.open('POST', createUrl, true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
 
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                xhr.onreadystatechange = function () { //function run when state of xhr status changes
+                    if (xhr.readyState === XMLHttpRequest.DONE) { //check if request is finished
                         if (xhr.status === 200) {
-                            const responseData = JSON.parse(xhr.responseText);
+                            const responseData = JSON.parse(xhr.responseText); // changes response body into json
                             console.log(responseData);
                         } else {
                             console.error('API Error: ', xhr.status, xhr.statusText);
                         }
                     }
                 }
-                xhr.send(JSON.stringify(requestData));
+                xhr.send(JSON.stringify(requestData)); // sends request message with data in json format 
                 
                 add(requestData, document.getElementById(requestData.idforDOM));
                 location.reload();
-                
         }))
 }
 
